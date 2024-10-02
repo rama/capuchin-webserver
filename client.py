@@ -1,10 +1,10 @@
 import socket
 import sys
 
-def main(host, port=None):
+def main(host, port=80):
     s = socket.socket()
     port = int(port)
-    server_address = (host, port) if port else (host, 80)
+    server_address = (host, port)
     s.connect(server_address)
     request = f"GET / HTTP/1.1\r\nHost: {host}" + (f":{port}" if port else "") + "\r\nConnection: close\r\n\r\n"
     s.sendall(request.encode("ISO-8859-1"))

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Tic Tac Toe</title>
+		<style>
+			body {
+				display: flex;
+				justify-content: center;
+			}
+			table {
+				border: 1px solid #222;
+			}
+			td {
+				width: 100px;
+				height: 100px;
+				border: 1px solid #222;
+				text-align: center;
+				font-size: 50px;
+			}
+			h1,
+			h2 {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Tic Tac Toe</h1>
+			<h2></h2>
+			<table id="board">
+				<tr>
+					<td id="0"></td>
+					<td id="1"></td>
+					<td id="2"></td>
+				</tr>
+				<tr>
+					<td id="3"></td>
+					<td id="4"></td>
+					<td id="5"></td>
+				</tr>
+				<tr>
+					<td id="6"></td>
+					<td id="7"></td>
+					<td id="8"></td>
+				</tr>
+			</table>
+		</div>
+		<script type="text/javascript">
+			let currentPlayer = "X";
+			let gameboard = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+
+			document.querySelector("h2").innerText = currentPlayer + "'s turn";
+
+			function recordMove(e) {
+				if (e.target.innerText) return;
+				e.target.innerText = currentPlayer;
+				gameboard[e.target.id] = currentPlayer;
+			}
+
+			function playComputerMove() {
+				let cellId;
+				do {
+					cellId = Math.floor(Math.random() * 9);
+				} while (gameboard[cellId] != cellId + 1);
+				document.getElementById(cellId).innerText = "O";
+				gameboard[cellId] = "O";
+			}
+
+			function checkGameOver() {
+				let result = getGameResult();
+				if (result) {
+					document.querySelector("h2").innerText = result;
+					return true;
+				} else {
+					document.querySelector("h2").innerText =
+						currentPlayer + "'s turn";
+					return false;
+				}
+			}
+
+			document.querySelectorAll("td").forEach((cell) => {
+				cell.addEventListener("click", function (e) {
+					recordMove(e);
+					if (!checkGameOver()) {
+						playComputerMove();
+						checkGameOver();
+					}
+				});
+			});
+			function getGameResult() {
+				let wins = [
+					"012",
+					"345",
+					"678",
+					"036",
+					"147",
+					"258",
+					"048",
+					"246",
+				];
+				let x = "",
+					o = "";
+				gameboard.forEach((element, index) => {
+					if (element === "X") x += index;
+					if (element === "O") o += index;
+				});
+				for (const win of wins) {
+					if (x.indexOf(win) > -1) {
+						endGame();
+						return "X is the winner";
+					} else if (o.indexOf(win) > -1) {
+						endGame();
+						return "O is the winner";
+					}
+				}
+				if (
+					gameboard.filter((el) => el === "X" || el === "O")
+						.length === 9
+				)
+					return "Game Over: Draw";
+				return false;
+			}
+			function endGame() {
+				document.querySelectorAll("td").forEach((cell) => {
+					cell.removeEventListener("click", recordMove);
+				});
+			}
+		</script>
+	</body>
+</html>

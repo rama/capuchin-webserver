@@ -78,14 +78,6 @@ def add_index_to_filepath(path):
             path += '/index.html'
     return path
 
-def construct_404_response():
-    return ("HTTP/1.1 404 Not Found\r\n" +
-            "Content-Type: text/plain\r\n" +
-            "Content-Length: 13\r\n" +
-            "Connection: close\r\n" +
-            "\r\n\r\n" +
-            "404 not found\r\n")
-
 def construct_response(status_code, content, content_type="text/plain"):
     return (f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\n" + 
             f"Content-Type: {content_type}\r\n" + 
@@ -95,4 +87,4 @@ def construct_response(status_code, content, content_type="text/plain"):
 try:
     main()
 except KeyboardInterrupt:
-        print("Server shutting down! Bye bye!")
+    print("Server shutting down! Bye bye!")

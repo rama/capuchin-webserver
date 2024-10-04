@@ -3,6 +3,12 @@ import socket
 import os
 
 SERVER_ROOT = os.path.abspath("./public")
+STATUSES = {
+    "200": "OK",
+    "404": "Not Found",
+    "403": "Forbidden",
+    "500": "Server Error",
+}
 
 def main(port=25600):
     s = socket.socket()
@@ -23,12 +29,26 @@ def main(port=25600):
         start_line = request.split('\r\n')[0].split(' ')
         print(start_line)
         if start_line[0] == "GET":
-            file_path = convert_to_file_path(start_line[1])
-            if file_path.startsWith(SERVER_ROOT):
-                content = get_file_content(start_line[1])
+            file_path = os.path.abspath(os.path.sep.join([SERVER_ROOT, start_line[1]]))
+            if file_path.startswith(SERVER_ROOT):
+                file_path = add_index_to_filepath(file_path)
+                try:
+                    with open(file_path, 'r') as f:
+                        content = f.read()
+                        response = construct_response("200", content)
+                except:
+                    # send 404
+                    print("404 Not Found")
+                    content = "not found"
+                    response = construct_response("404", content)
+            else:
+                # send 403
+                print("403 Forbidden")
+                content = "forbidden"
+                response = construct_response("403", content)
+        
         headers = parse_request_and_get_headers(request)
-        print(headers)
-        response = construct_response(content)
+        # print(content)
         new_socket.sendall(response.encode("ISO-8859-1"))
         new_socket.close()
 
@@ -40,16 +60,14 @@ def parse_request_and_get_headers(request):
         headers[match[0]] = match[1]
     return headers
 
-def convert_to_file_path(request_path):
-    file_path = os.path.abspath(os.path.sep.join(SERVER_ROOT, request_path))
-    return file_path
-
-def get_file_content(file_path):
-    try:
-        with open(file_path, 'r') as f:
-            return f.read()
-    except:
-        return construct_404_response()
+def add_index_to_filepath(path):
+    # check if the file_path ends with .html or a trailing slash?
+    if not path.endswith('.html'):
+        if path.endswith('/'): 
+            path += 'index.html'
+        else:
+            path += '/index.html'
+    return path
 
 def construct_404_response():
     return ("HTTP/1.1 404 Not Found\r\n" +
@@ -59,9 +77,8 @@ def construct_404_response():
             "\r\n\r\n" +
             "404 not found\r\n")
 
-
-def construct_response(content):
-    return f"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {len(content)}\r\nConnection: close\r\n\r\n{content}\r\n\r\n";
+def construct_response(status_code, content):
+    return f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\nContent-Type: text/html\r\nContent-Length: {len(content)}\r\nConnection: close\r\n\r\n{content}\r\n\r\n";
 
 try:
     main()

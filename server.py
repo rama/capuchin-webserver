@@ -9,6 +9,13 @@ STATUSES = {
     "403": "Forbidden",
     "500": "Server Error",
 }
+MIME_TYPES = {
+    ".txt": "text/plain",
+    ".html": "text/html",
+    ".pdf": "application/pdf",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+}
 
 def main(port=25600):
     s = socket.socket()
@@ -32,10 +39,12 @@ def main(port=25600):
             file_path = os.path.abspath(os.path.sep.join([SERVER_ROOT, start_line[1]]))
             if file_path.startswith(SERVER_ROOT):
                 file_path = add_index_to_filepath(file_path)
+                extension = os.path.splitext(file_path)[-1]
+                content_type = MIME_TYPES[extension]
                 try:
                     with open(file_path, 'r') as f:
                         content = f.read()
-                        response = construct_response("200", content)
+                        response = construct_response("200", content, content_type)
                 except:
                     # send 404
                     print("404 Not Found")
@@ -77,8 +86,11 @@ def construct_404_response():
             "\r\n\r\n" +
             "404 not found\r\n")
 
-def construct_response(status_code, content):
-    return f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\nContent-Type: text/html\r\nContent-Length: {len(content)}\r\nConnection: close\r\n\r\n{content}\r\n\r\n";
+def construct_response(status_code, content, content_type="text/plain"):
+    return (f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\n" + 
+            f"Content-Type: {content_type}\r\n" + 
+            f"Content-Length: {len(content)}\r\n" + 
+            f"Connection: close\r\n\r\n{content}\r\n\r\n");
 
 try:
     main()

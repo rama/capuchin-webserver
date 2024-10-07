@@ -30,7 +30,7 @@ MIME_TYPES = {
 class Server:
     def __init__(self, port=25600, server_root="./public"):
         self.PORT = port
-        self.self.SERVER_ROOT = os.path.abspath(server_root)
+        self.SERVER_ROOT = os.path.abspath(server_root)
         self.socket = socket.socket()
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         address = ("", self.PORT)
@@ -67,7 +67,7 @@ class Server:
         if not file_path.startswith(self.SERVER_ROOT):
             print("403 Forbidden")
             content = "forbidden"
-            return construct_response("403", content)
+            return self._construct_response("403", content)
 
         file_path = add_index_to_filepath(file_path)
         extension = os.path.splitext(file_path)[-1]
@@ -75,11 +75,19 @@ class Server:
         try:
             with open(file_path, "r") as f:
                 content = f.read()
-                return construct_response("200", content, content_type)
+                return self._construct_response("200", content, content_type)
         except:
             print("404 Not Found")
             content = "not found"
-            return construct_response("404", content)
+            return self._construct_response("404", content)
+
+    def _construct_response(self, status_code, content, content_type="text/plain"):
+        return (
+            f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\n"
+            + f"Content-Type: {content_type}\r\n"
+            + f"Content-Length: {len(content)}\r\n"
+            + f"Connection: close\r\n\r\n{content}\r\n\r\n"
+        )
 
     def stop(self):
         pass
@@ -102,15 +110,6 @@ def add_index_to_filepath(path):
         else:
             path += "/index.html"
     return path
-
-
-def construct_response(status_code, content, content_type="text/plain"):
-    return (
-        f"HTTP/1.1 {status_code} {STATUSES[status_code]}\r\n"
-        + f"Content-Type: {content_type}\r\n"
-        + f"Content-Length: {len(content)}\r\n"
-        + f"Connection: close\r\n\r\n{content}\r\n\r\n"
-    )
 
 
 def main():

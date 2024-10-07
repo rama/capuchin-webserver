@@ -23,7 +23,7 @@ MIME_TYPES = {
 # x not needed yet - should i track state?
 # maybe move to create_socket etc
 # x method for now - parse request in separate class or method?
-# TODO construct response - should response be a dataclass?
+# x construct response - should response be a dataclass? no, but maybe move to str.format
 # TODO add pylint and mypy type annotations?
 
 

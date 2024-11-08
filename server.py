@@ -47,10 +47,10 @@ class Server:
         new_connection = self.socket.accept()
         new_socket = new_connection[0]
         req = new_socket.recv(1024)
-        request = req.decode("ISO-8859-1")
+        request = req.decode("utf-8")
         while "\r\n\r\n" not in req.decode():
             req = new_socket.recv(1024)
-            request += req.decode("ISO-8859-1")
+            request += req.decode("utf-8")
         print(request)
         start_line = request.split("\r\n")[0].split(" ")
         print(start_line)
@@ -58,7 +58,7 @@ class Server:
             response = self._handle_get(start_line[1])
 
         # headers = parse_request_and_get_headers(request)
-        new_socket.sendall(response.encode("ISO-8859-1"))
+        new_socket.sendall(response.encode("utf-8"))
         new_socket.close()
 
     def _handle_get(self, target):

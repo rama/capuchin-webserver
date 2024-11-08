@@ -73,10 +73,10 @@ class Server:
         extension = os.path.splitext(file_path)[-1]
         content_type = MIME_TYPES[extension]
         try:
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
                 return self._construct_response("200", content, content_type)
-        except:
+        except (FileNotFoundError, PermissionError):
             print("404 Not Found")
             content = "not found"
             return self._construct_response("404", content)

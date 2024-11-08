@@ -45,7 +45,10 @@ class Server:
         print("Server running on port {self.PORT}...")
 
         while True:
-            self._handle_request()
+            try:
+                self._handle_request()
+            except Exception as e:
+                print(f"Error handling request: {e}")
 
     def _handle_request(self):
         new_connection = self.socket.accept()

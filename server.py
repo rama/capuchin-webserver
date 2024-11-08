@@ -31,14 +31,18 @@ class Server:
     def __init__(self, port=25600, server_root="./public"):
         self.PORT = port
         self.SERVER_ROOT = os.path.abspath(server_root)
+        self.socket = None
+
+    def create_socket(self):
         self.socket = socket.socket()
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         address = ("", self.PORT)
         self.socket.bind(address)
 
     def run(self):
+        self.create_socket()
         self.socket.listen()
-        print("Server running...")
+        print("Server running on port {self.PORT}...")
 
         while True:
             self._handle_request()
